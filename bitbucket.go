@@ -30,6 +30,7 @@ type Client struct {
 	baseURL *url.URL
 
 	Projects ProjectService
+	Repos    RepoService
 }
 
 var (
@@ -62,6 +63,7 @@ func NewClient(baseURL string, base64creds string) (*Client, error) {
 	}
 
 	c.Projects = &projectService{client: c}
+	c.Repos = &repoService{client: c}
 
 	return c, nil
 }
