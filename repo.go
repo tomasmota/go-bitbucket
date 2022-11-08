@@ -42,18 +42,18 @@ type GetRepoRequest struct {
 	Slug       string
 }
 
-func (ps *repoService) GetRepo(ctx context.Context, getReq *GetRepoRequest) (*Repo, error) {
-	req, err := ps.client.newRequest("GET", fmt.Sprintf("projects/%s/repos/%s", getReq.ProjectKey, getReq.Slug), nil)
+func (rs *repoService) GetRepo(ctx context.Context, getReq *GetRepoRequest) (*Repo, error) {
+	req, err := rs.client.newRequest("GET", fmt.Sprintf("projects/%s/repos/%s", getReq.ProjectKey, getReq.Slug), nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for getting repos: %w", err)
 	}
 
-	p := Repo{}
-	err = ps.client.do(ctx, req, &p)
+	r := Repo{}
+	err = rs.client.do(ctx, req, &r)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching repos: %w", err)
 	}
-	return &p, nil
+	return &r, nil
 }
 
 // TODO: Add other fields
@@ -65,19 +65,19 @@ type CreateRepoRequest struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (ps *repoService) CreateRepo(ctx context.Context, createReq *CreateRepoRequest) (*Repo, error) {
-	req, err := ps.client.newRequest("POST", fmt.Sprintf("projects/%s/repos", createReq.ProjectKey), createReq)
+func (rs *repoService) CreateRepo(ctx context.Context, createReq *CreateRepoRequest) (*Repo, error) {
+	req, err := rs.client.newRequest("POST", fmt.Sprintf("projects/%s/repos", createReq.ProjectKey), createReq)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for creating repo: %w", err)
 	}
 
-	p := Repo{}
-	err = ps.client.do(ctx, req, &p)
+	r := Repo{}
+	err = rs.client.do(ctx, req, &r)
 	if err != nil {
 		return nil, fmt.Errorf("error creating repo: %w", err)
 	}
 
-	return &p, nil
+	return &r, nil
 }
 
 // DeleteRepoRequest contains the fields required to delete a repo
@@ -86,13 +86,13 @@ type DeleteRepoRequest struct {
 	Slug       string `json:"slug"`
 }
 
-func (ps *repoService) DeleteRepo(ctx context.Context, deleteReq *DeleteRepoRequest) error {
-	req, err := ps.client.newRequest("DELETE", fmt.Sprintf("projects/%s/repos/%s", deleteReq.ProjectKey, deleteReq.Slug), nil)
+func (rs *repoService) DeleteRepo(ctx context.Context, deleteReq *DeleteRepoRequest) error {
+	req, err := rs.client.newRequest("DELETE", fmt.Sprintf("projects/%s/repos/%s", deleteReq.ProjectKey, deleteReq.Slug), nil)
 	if err != nil {
 		return fmt.Errorf("error creating request for deleting repo: %w", err)
 	}
 
-	err = ps.client.do(ctx, req, nil)
+	err = rs.client.do(ctx, req, nil)
 	if err != nil {
 		return fmt.Errorf("error deleting repo: %w", err)
 	}
@@ -108,17 +108,17 @@ type UpdateRepoRequest struct {
 	Description string `json:"description,omitempty"`
 }
 
-func (ps *repoService) UpdateRepo(ctx context.Context, updateReq *UpdateRepoRequest) (*Repo, error) {
-	req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s/repos/%s", updateReq.ProjectKey, updateReq.Slug), updateReq)
+func (rs *repoService) UpdateRepo(ctx context.Context, updateReq *UpdateRepoRequest) (*Repo, error) {
+	req, err := rs.client.newRequest("PUT", fmt.Sprintf("projects/%s/repos/%s", updateReq.ProjectKey, updateReq.Slug), updateReq)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for updating repo: %w", err)
 	}
 
-	p := Repo{}
-	err = ps.client.do(ctx, req, &p)
+	r := Repo{}
+	err = rs.client.do(ctx, req, &r)
 	if err != nil {
 		return nil, fmt.Errorf("error updating repo: %w", err)
 	}
 
-	return &p, nil
+	return &r, nil
 }
