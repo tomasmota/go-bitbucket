@@ -13,7 +13,7 @@ type ProjectService interface {
 	CreateProject(context.Context, *CreateProjectRequest) (*Project, error)
 	DeleteProject(context.Context, *DeleteProjectRequest) error
 	UpdateProject(context.Context, *UpdateProjectRequest) (*Project, error)
-	AddPermission(context.Context, *AddPermissionRequest) (*Project, error)
+	AddPermission(context.Context, *AddPermissionRequest) error
 }
 
 type projectService struct {
