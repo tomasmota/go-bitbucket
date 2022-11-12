@@ -3,6 +3,8 @@ package bitbucket
 import (
 	"context"
 	"fmt"
+
+	"github.com/go-playground/validator/v10"
 )
 
 // ProjectService provides operations around bitbucket projects
@@ -17,6 +19,8 @@ type ProjectService interface {
 type projectService struct {
 	client *Client
 }
+
+var validate *validator.Validate
 
 // Project represents a Bitbucket Project
 type Project struct {
@@ -114,23 +118,29 @@ func (ps *projectService) UpdateProject(ctx context.Context, updateReq *UpdatePr
 
 // AddPermissionRequest contains the fields required to update a project
 type AddPermissionRequest struct {
-	Key         string `json:"key"`
-	Description string `json:"description,omitempty"`
-	Public      bool   `json:"public,omitempty"`
+	ProjectKey string `validate:"required"`
+	Group      string `validate:"required"`
+	Permission string `validate:"required,oneof='PROJECT_READ' 'PROJECT_WRITE' 'PROJECT_ADMIN'"`
 }
 
-func (ps *projectService) AddPermission(ctx context.Context, apReq *AddPermissionRequest) (*Project, error) {
-	panic("not implemented")
-	// req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s/permissions/groups", apReq.Key), apReq)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error creating request for updating project: %w", err)
-	// }
-	// req.Header.Add(name, "")
-	// p := Project{}
-	// err = ps.client.do(ctx, req, &p)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error updating project: %w", err)
-	// }
+func (ps *projectService) AddPermission(ctx context.Context, apReq *AddPermissionRequest) error {
+	err := validate.Struct(apReq)
+	if err != nil {
+		panic(err)
+	}
 
-	// return &p, nil
+	req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s/permissions/groups", apReq.ProjectKey), apReq)
+	if err != nil {
+		return fmt.Errorf("error creating request for adding permission to project: %w", err)
+	}
+	q := req.URL.Query()
+	q.Add("name", apReq.Group)
+	q.Add("permission", apReq.Permission)
+
+	err = ps.client.do(ctx, req, nil)
+	if err != nil {
+		return fmt.Errorf("error adding permission to project: %w", err)
+	}
+
+	return nil
 }
