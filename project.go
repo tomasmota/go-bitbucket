@@ -11,6 +11,7 @@ type ProjectService interface {
 	CreateProject(context.Context, *CreateProjectRequest) (*Project, error)
 	DeleteProject(context.Context, *DeleteProjectRequest) error
 	UpdateProject(context.Context, *UpdateProjectRequest) (*Project, error)
+	AddPermission(context.Context, *AddPermissionRequest) (*Project, error)
 }
 
 type projectService struct {
@@ -109,4 +110,27 @@ func (ps *projectService) UpdateProject(ctx context.Context, updateReq *UpdatePr
 	}
 
 	return &p, nil
+}
+
+// AddPermissionRequest contains the fields required to update a project
+type AddPermissionRequest struct {
+	Key         string `json:"key"`
+	Description string `json:"description,omitempty"`
+	Public      bool   `json:"public,omitempty"`
+}
+
+func (ps *projectService) AddPermission(ctx context.Context, apReq *AddPermissionRequest) (*Project, error) {
+	panic("not implemented")
+	// req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s/permissions/groups", apReq.Key), apReq)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error creating request for updating project: %w", err)
+	// }
+	// req.Header.Add(name, "")
+	// p := Project{}
+	// err = ps.client.do(ctx, req, &p)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error updating project: %w", err)
+	// }
+
+	// return &p, nil
 }
