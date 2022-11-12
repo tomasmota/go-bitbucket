@@ -116,7 +116,7 @@ func (ps *projectService) UpdateProject(ctx context.Context, updateReq *UpdatePr
 	return &p, nil
 }
 
-// AddPermissionRequest contains the fields required to update a project
+// AddPermissionRequest contains the fields required to give a certain group permissions in a project
 type AddPermissionRequest struct {
 	ProjectKey string `validate:"required"`
 	Group      string `validate:"required"`
