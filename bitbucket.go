@@ -3,10 +3,12 @@ package bitbucket
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -16,6 +18,16 @@ const (
 	apiPath       = "/rest/api/1.0/"
 	jsonMediaType = "application/json"
 )
+
+type Config struct {
+	Host string
+	Port string
+
+	// HTTP tokens only permit operations in existing projects, so we must use basic auth to be able to create them
+	// See https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html#HTTPaccesstokens-permissions
+	Username string
+	Password string
+}
 
 // Client encapsulates a client that talks to the bitbucket server api
 // API Docs: https://developer.atlassian.com/server/bitbucket/rest/v805/intro/
@@ -45,14 +57,16 @@ var (
 )
 
 // NewClient creates a new instance of the bitbucket client
-func NewClient(baseURL string, base64creds string) (*Client, error) {
-	pBaseURL, err := url.Parse(fmt.Sprintf("%s%s", baseURL, apiPath))
+func NewClient(config Config) (*Client, error) {
+	baseURL, err := url.Parse(net.JoinHostPort(fmt.Sprintf("%s%s", config.Host, apiPath), config.Port))
 	if err != nil {
 		return nil, err
 	}
 
+	base64creds := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", config.Username, config.Password)))
+	fmt.Println(base64creds)
 	c := &Client{
-		baseURL: pBaseURL,
+		baseURL: baseURL,
 		client:  &http.Client{Timeout: time.Second * 10},
 		headers: map[string]string{"Authorization": "Basic " + base64creds},
 	}
