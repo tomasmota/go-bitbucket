@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -20,8 +19,8 @@ const (
 )
 
 type Config struct {
-	Host string
-	Port string
+	Host   string
+	Scheme string
 
 	// HTTP tokens only permit operations in existing projects, so we must use basic auth to be able to create them
 	// See https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html#HTTPaccesstokens-permissions
@@ -58,20 +57,24 @@ var (
 
 // NewClient creates a new instance of the bitbucket client
 func NewClient(config Config) (*Client, error) {
-	baseURL, err := url.Parse(net.JoinHostPort(fmt.Sprintf("%s%s", config.Host, apiPath), config.Port))
-	if err != nil {
-		return nil, err
+	if config.Scheme == "" {
+		config.Scheme = "https" // Allow setting scheme to http for testing
+	}
+
+	baseURL := &url.URL{
+		Scheme: config.Scheme,
+		Host:   config.Host,
+		Path:   apiPath,
 	}
 
 	base64creds := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", config.Username, config.Password)))
-	fmt.Println(base64creds)
 	c := &Client{
 		baseURL: baseURL,
 		client:  &http.Client{Timeout: time.Second * 10},
 		headers: map[string]string{"Authorization": "Basic " + base64creds},
 	}
 
-	err = c.ping()
+	err := c.ping()
 	if err != nil {
 		return nil, fmt.Errorf("error creating bitbucket client: %w", err)
 	}
