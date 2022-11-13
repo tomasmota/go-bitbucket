@@ -2,10 +2,18 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/tomas-mota/go-bitbucket"
+)
+
+const (
+	projectName = "TestProject"
+	projectKey  = "TPO"
+	desc        = "My Test Project"
+	updatedDesc = "My Updated Project"
 )
 
 func main() {
@@ -32,29 +40,65 @@ func main() {
 	}
 
 	ctx := context.Background()
-	c.Projects.CreateProject(
-		ctx,
+
+	// Create
+	_, err = c.Projects.CreateProject(ctx,
 		&bitbucket.CreateProjectRequest{
-			Name:        "TestProject",
-			Key:         "TPO",
-			Description: "My Test Project",
+			Name:        projectName,
+			Key:         projectKey,
+			Description: desc,
 			Public:      true,
 		},
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	c.Projects.UpdateProject(
-		ctx,
+	fmt.Println("project created")
+
+	// Update
+	p, err := c.Projects.UpdateProject(ctx,
 		&bitbucket.UpdateProjectRequest{
-			Key:         "TPO",
-			Description: "Updated Project",
+			Key:         projectKey,
+			Description: updatedDesc,
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if p.Description != updatedDesc {
+		log.Fatal("project was not updated as expected")
+	}
+	fmt.Println("project updated")
+
+	// Get and validate again
+	p, err = c.Projects.GetProject(ctx,
+		&bitbucket.GetProjectRequest{
+			Key: projectKey,
 		},
 	)
 
-	c.Projects.DeleteProject(
-		ctx,
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if p.Description != updatedDesc {
+		log.Fatal("project was not updated as expected")
+	}
+
+	fmt.Println("project update validated")
+
+	//Delete
+	err = c.Projects.DeleteProject(ctx,
 		&bitbucket.DeleteProjectRequest{
-			Key: "TPO",
+			Key: projectKey,
 		},
 	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("project deleted")
 
 }
