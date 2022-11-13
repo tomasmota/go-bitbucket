@@ -144,3 +144,30 @@ func (ps *projectService) AddPermission(ctx context.Context, apReq *AddPermissio
 
 	return nil
 }
+
+// RevokePermissionRequest contains the fields required to revoke a certain group permissions in a project
+type RevokePermissionRequest struct {
+	ProjectKey string `validate:"required"`
+	Group      string `validate:"required"`
+}
+
+func (ps *projectService) RevokePermission(ctx context.Context, apReq *RevokePermissionRequest) error {
+	err := validate.Struct(apReq)
+	if err != nil {
+		panic(err)
+	}
+
+	req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s/permissions/groups", apReq.ProjectKey), apReq)
+	if err != nil {
+		return fmt.Errorf("error creating request for adding permission to project: %w", err)
+	}
+	q := req.URL.Query()
+	q.Add("name", apReq.Group)
+
+	err = ps.client.do(ctx, req, nil)
+	if err != nil {
+		return fmt.Errorf("error adding permission to project: %w", err)
+	}
+
+	return nil
+}
