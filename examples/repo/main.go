@@ -52,6 +52,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fmt.Println("project created")
+
 	r, err := c.Repos.CreateRepo(ctx,
 		&bitbucket.CreateRepoRequest{
 			ProjectKey: projectKey,
@@ -62,8 +64,9 @@ func main() {
 		log.Fatal(err)
 	}
 	slug := r.Slug
-	fmt.Printf("Repo %s created", r.Slug)
+	fmt.Printf("repo %s created", r.Slug)
 
+	// Delete Repo
 	err = c.Repos.DeleteRepo(ctx,
 		&bitbucket.DeleteRepoRequest{
 			ProjectKey: projectKey,
@@ -73,5 +76,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Repo %s deleted", r.Slug)
+	fmt.Printf("repo %s deleted", r.Slug)
+
+	// Delete Project
+	err = c.Projects.DeleteProject(ctx,
+		&bitbucket.DeleteProjectRequest{
+			Key: projectKey,
+		},
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("project deleted")
 }
