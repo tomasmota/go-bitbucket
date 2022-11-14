@@ -40,7 +40,7 @@ func main() {
 
 	ctx := context.Background()
 
-	// Create
+	// Create Project to put repo in
 	_, err = c.Projects.CreateProject(ctx,
 		&bitbucket.CreateProjectRequest{
 			Name:   projectName,
@@ -61,6 +61,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	slug := r.Slug
 	fmt.Printf("Repo %s created", r.Slug)
 
+	err = c.Repos.DeleteRepo(ctx,
+		&bitbucket.DeleteRepoRequest{
+			ProjectKey: projectKey,
+			Slug:       slug,
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Repo %s deleted", r.Slug)
 }
