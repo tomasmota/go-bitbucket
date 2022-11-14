@@ -64,7 +64,7 @@ func main() {
 		log.Fatal(err)
 	}
 	slug := r.Slug
-	fmt.Printf("repo %s created", r.Slug)
+	fmt.Printf("repo %s created\n", r.Slug)
 
 	// Delete Repo
 	err = c.Repos.DeleteRepo(ctx,
@@ -76,7 +76,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("repo %s deleted", r.Slug)
+	fmt.Printf("repo %s deleted\n", r.Slug)
 
 	// Delete Project
 	err = c.Projects.DeleteProject(ctx,
