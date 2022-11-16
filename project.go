@@ -39,6 +39,10 @@ type GetProjectRequest struct {
 }
 
 func (ps *projectService) GetProject(ctx context.Context, getReq *GetProjectRequest) (*Project, error) {
+	err := validate.Struct(getReq)
+	if err != nil {
+		return nil, ErrParameters
+	}
 	req, err := ps.client.newRequest("GET", fmt.Sprintf("projects/%s", getReq.Key), nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for getting projects: %w", err)
@@ -61,6 +65,11 @@ type CreateProjectRequest struct {
 }
 
 func (ps *projectService) CreateProject(ctx context.Context, createReq *CreateProjectRequest) (*Project, error) {
+	err := validate.Struct(createReq)
+	if err != nil {
+		return nil, ErrParameters
+	}
+
 	req, err := ps.client.newRequest("POST", "projects", createReq)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for creating project: %w", err)
@@ -77,10 +86,14 @@ func (ps *projectService) CreateProject(ctx context.Context, createReq *CreatePr
 
 // DeleteProjectRequest contains the fields required to delete a project
 type DeleteProjectRequest struct {
-	Key string `json:"key"`
+	Key string `json:"key" validate:"required"`
 }
 
 func (ps *projectService) DeleteProject(ctx context.Context, deleteReq *DeleteProjectRequest) error {
+	err := validate.Struct(deleteReq)
+	if err != nil {
+		return ErrParameters
+	}
 	req, err := ps.client.newRequest("DELETE", fmt.Sprintf("projects/%s", deleteReq.Key), nil)
 	if err != nil {
 		return fmt.Errorf("error creating request for deleting project: %w", err)
@@ -102,6 +115,10 @@ type UpdateProjectRequest struct {
 }
 
 func (ps *projectService) UpdateProject(ctx context.Context, updateReq *UpdateProjectRequest) (*Project, error) {
+	err := validate.Struct(updateReq)
+	if err != nil {
+		return nil, ErrParameters
+	}
 	req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s", updateReq.Key), updateReq)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for updating project: %w", err)
