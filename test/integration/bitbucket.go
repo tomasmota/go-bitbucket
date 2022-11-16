@@ -9,8 +9,9 @@ import (
 
 var client *bitbucket.Client
 
+// Configures a client to be used in testing
+// NOTE: these integration tests require a bitbucket instance to be running on localhost
 func init() {
-
 	username := os.Getenv("BITBUCKET_USERNAME")
 	if username == "" {
 		log.Fatal("no username provide")
