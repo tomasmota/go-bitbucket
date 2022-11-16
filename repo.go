@@ -10,7 +10,7 @@ type RepoService interface {
 	GetRepo(ctx context.Context, projectKey string, slug string) (*Repo, error)
 	CreateRepo(ctx context.Context, createReq *CreateRepoRequest) (*Repo, error)
 	DeleteRepo(ctx context.Context, projectKey string, slug string) error
-	UpdateRepo(ctx context.Context, updateReq *UpdateRepoRequest) (*Repo, error)
+	UpdateRepo(ctx context.Context, projectKey string, slug string, updateReq *UpdateRepoRequest) (*Repo, error)
 }
 
 type repoService struct {
