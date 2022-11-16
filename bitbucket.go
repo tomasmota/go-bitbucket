@@ -53,6 +53,8 @@ var (
 	ErrResponseMalformed = errors.New("response_malformed")
 	// ErrConflict is used when a duplicate resource is trying to be created
 	ErrConflict = errors.New("conflict")
+	// ErrBadRequest is used when a bad set of parameters is passed into a function
+	ErrParameters = errors.New("parameters")
 )
 
 // NewClient creates a new instance of the bitbucket client

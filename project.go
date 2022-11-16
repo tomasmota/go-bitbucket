@@ -35,7 +35,7 @@ type Project struct {
 
 // GetProjectRequest contains the fields required to fetch a project
 type GetProjectRequest struct {
-	Key string `json:"key"`
+	Key string `json:"key" validate:"required"`
 }
 
 func (ps *projectService) GetProject(ctx context.Context, getReq *GetProjectRequest) (*Project, error) {
@@ -54,8 +54,8 @@ func (ps *projectService) GetProject(ctx context.Context, getReq *GetProjectRequ
 
 // CreateProjectRequest contains the fields required to create a project
 type CreateProjectRequest struct {
-	Name        string `json:"name"`
-	Key         string `json:"key"`
+	Name        string `json:"name" validate:"required"`
+	Key         string `json:"key" validate:"required"`
 	Description string `json:"description,omitempty"`
 	Public      bool   `json:"public,omitempty"`
 }
@@ -96,7 +96,7 @@ func (ps *projectService) DeleteProject(ctx context.Context, deleteReq *DeletePr
 
 // UpdateProjectRequest contains the fields required to update a project
 type UpdateProjectRequest struct {
-	Key         string `json:"key"`
+	Key         string `json:"key" validate:"required"`
 	Description string `json:"description,omitempty"`
 	Public      bool   `json:"public,omitempty"`
 }
@@ -126,7 +126,7 @@ type AddPermissionRequest struct {
 func (ps *projectService) AddPermission(ctx context.Context, apReq *AddPermissionRequest) error {
 	err := validate.Struct(apReq)
 	if err != nil {
-		panic(err)
+		return ErrParameters
 	}
 
 	req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s/permissions/groups", apReq.ProjectKey), apReq)
@@ -154,7 +154,7 @@ type RevokePermissionRequest struct {
 func (ps *projectService) RevokePermission(ctx context.Context, apReq *RevokePermissionRequest) error {
 	err := validate.Struct(apReq)
 	if err != nil {
-		panic(err)
+		return ErrParameters
 	}
 
 	req, err := ps.client.newRequest("PUT", fmt.Sprintf("projects/%s/permissions/groups", apReq.ProjectKey), apReq)
