@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	projectName = "TestProject"
-	projectKey  = "TPO"
-	repoName    = "TestRepo"
+	projectName     = "TestProject"
+	projectKey      = "TPO"
+	repoName        = "TestRepo"
+	updatedRepoName = "UpdatedTestRepo"
 )
 
 func main() {
@@ -54,6 +55,7 @@ func main() {
 
 	fmt.Println("project created")
 
+	// Create Repo
 	r, err := c.Repos.CreateRepo(ctx,
 		&bitbucket.CreateRepoRequest{
 			ProjectKey: projectKey,
@@ -65,6 +67,22 @@ func main() {
 	}
 	slug := r.Slug
 	fmt.Printf("repo %s created\n", slug)
+
+	// Update Repo
+	_, err = c.Repos.UpdateRepo(ctx, projectKey, slug, &bitbucket.UpdateRepoRequest{Name: updatedRepoName})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Get Repo
+	r, err = c.Repos.GetRepo(ctx, projectKey, slug)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if r.Name != updatedRepoName {
+		log.Fatal("repo was not updated")
+	}
+	fmt.Printf("repo %s has been correctly updated \n", slug)
 
 	// Delete Repo
 	err = c.Repos.DeleteRepo(ctx, projectKey, slug)

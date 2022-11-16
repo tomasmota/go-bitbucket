@@ -3,8 +3,6 @@ package bitbucket
 import (
 	"context"
 	"fmt"
-
-	"github.com/go-playground/validator/v10"
 )
 
 // ProjectService provides operations around bitbucket projects
@@ -19,8 +17,6 @@ type ProjectService interface {
 type projectService struct {
 	client *Client
 }
-
-var validate *validator.Validate
 
 // Project represents a Bitbucket Project
 type Project struct {

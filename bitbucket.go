@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -57,6 +59,8 @@ var (
 	ErrParameters = errors.New("parameters")
 )
 
+var validate *validator.Validate // used to validate structs in different services
+
 // NewClient creates a new instance of the bitbucket client
 func NewClient(config Config) (*Client, error) {
 	if config.Scheme == "" {
@@ -83,6 +87,8 @@ func NewClient(config Config) (*Client, error) {
 
 	c.Projects = &projectService{client: c}
 	c.Repos = &repoService{client: c}
+
+	validate = validator.New()
 
 	return c, nil
 }
