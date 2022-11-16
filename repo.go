@@ -7,10 +7,10 @@ import (
 
 // RepoService provides operations around bitbucket repos
 type RepoService interface {
-	GetRepo(context.Context, *GetRepoRequest) (*Repo, error)
-	CreateRepo(context.Context, *CreateRepoRequest) (*Repo, error)
-	DeleteRepo(context.Context, *DeleteRepoRequest) error
-	UpdateRepo(context.Context, *UpdateRepoRequest) (*Repo, error)
+	GetRepo(ctx context.Context, projectKey string, slug string) (*Repo, error)
+	CreateRepo(ctx context.Context, createReq *CreateRepoRequest) (*Repo, error)
+	DeleteRepo(ctx context.Context, projectKey string, slug string) error
+	UpdateRepo(ctx context.Context, updateReq *UpdateRepoRequest) (*Repo, error)
 }
 
 type repoService struct {
@@ -36,14 +36,8 @@ type Repo struct {
 	Public        bool     `json:"public"`
 }
 
-// GetRepoRequest contains the fields required to fetch a repo
-type GetRepoRequest struct {
-	ProjectKey string
-	Slug       string
-}
-
-func (rs *repoService) GetRepo(ctx context.Context, getReq *GetRepoRequest) (*Repo, error) {
-	req, err := rs.client.newRequest("GET", fmt.Sprintf("projects/%s/repos/%s", getReq.ProjectKey, getReq.Slug), nil)
+func (rs *repoService) GetRepo(ctx context.Context, projectKey string, slug string) (*Repo, error) {
+	req, err := rs.client.newRequest("GET", fmt.Sprintf("projects/%s/repos/%s", projectKey, slug), nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for getting repos: %w", err)
 	}
@@ -60,12 +54,16 @@ func (rs *repoService) GetRepo(ctx context.Context, getReq *GetRepoRequest) (*Re
 // CreateRepoRequest contains the fields required to create a repo
 type CreateRepoRequest struct {
 	ProjectKey  string
-	Name        string `json:"name"`
+	Name        string `json:"name" validate:"required"`
 	Slug        string `json:"slug"`
 	Description string `json:"description,omitempty"`
 }
 
 func (rs *repoService) CreateRepo(ctx context.Context, createReq *CreateRepoRequest) (*Repo, error) {
+	err := validate.Struct(createReq)
+	if err != nil {
+		return nil, ErrParameters
+	}
 	req, err := rs.client.newRequest("POST", fmt.Sprintf("projects/%s/repos", createReq.ProjectKey), createReq)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for creating repo: %w", err)
@@ -80,14 +78,8 @@ func (rs *repoService) CreateRepo(ctx context.Context, createReq *CreateRepoRequ
 	return &r, nil
 }
 
-// DeleteRepoRequest contains the fields required to delete a repo
-type DeleteRepoRequest struct {
-	ProjectKey string
-	Slug       string `json:"slug"`
-}
-
-func (rs *repoService) DeleteRepo(ctx context.Context, deleteReq *DeleteRepoRequest) error {
-	req, err := rs.client.newRequest("DELETE", fmt.Sprintf("projects/%s/repos/%s", deleteReq.ProjectKey, deleteReq.Slug), nil)
+func (rs *repoService) DeleteRepo(ctx context.Context, projectKey string, slug string) error {
+	req, err := rs.client.newRequest("DELETE", fmt.Sprintf("projects/%s/repos/%s", projectKey, slug), nil)
 	if err != nil {
 		return fmt.Errorf("error creating request for deleting repo: %w", err)
 	}
@@ -102,14 +94,12 @@ func (rs *repoService) DeleteRepo(ctx context.Context, deleteReq *DeleteRepoRequ
 
 // UpdateRepoRequest contains the fields required to update a repo
 type UpdateRepoRequest struct {
-	ProjectKey  string
 	Name        string `json:"name"`
-	Slug        string `json:"slug"`
 	Description string `json:"description,omitempty"`
 }
 
-func (rs *repoService) UpdateRepo(ctx context.Context, updateReq *UpdateRepoRequest) (*Repo, error) {
-	req, err := rs.client.newRequest("PUT", fmt.Sprintf("projects/%s/repos/%s", updateReq.ProjectKey, updateReq.Slug), updateReq)
+func (rs *repoService) UpdateRepo(ctx context.Context, projectKey string, slug string, updateReq *UpdateRepoRequest) (*Repo, error) {
+	req, err := rs.client.newRequest("PUT", fmt.Sprintf("projects/%s/repos/%s", projectKey, slug), updateReq)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request for updating repo: %w", err)
 	}
