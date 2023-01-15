@@ -1,8 +1,11 @@
-module github.com/tomas-mota/go-bitbucket
+module github.com/tomasmota/go-bitbucket
 
 go 1.19
 
-require github.com/go-playground/validator/v10 v10.11.1
+require (
+	github.com/go-playground/validator/v10 v10.11.1
+	github.com/tomas-mota/go-bitbucket v0.0.1
+)
 
 require (
 	github.com/go-playground/locales v0.14.0 // indirect
